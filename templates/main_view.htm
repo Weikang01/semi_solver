@@ -1,0 +1,316 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en"  translate="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="{% static '/js/jquery.min.js' %}"></script>
+    <script>
+        MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']]
+          },
+          svg: {
+            fontCache: 'global'
+          }
+        };
+    </script>
+    <link rel="icon" type="image/png" href="{% static '/images/favicon.ico' %}"/>
+    <script src="{% static '/js/page_ctr.js' %}"></script>
+    <!-- https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/tex-mml-chtml.js -->
+    <script id="MathJax-script" src="{% static '/js/tex-mml-chtml.js' %}"></script>
+    <script src="{% static '/js/main.js' %}"></script>
+    <style>
+        #navi_bar{
+            list-style:none;
+            margin: 0;
+            padding-left: 10px;
+            padding-bottom: 10px;
+        }
+        #navi_bar>li{
+            display: inline;
+            background:#CCC;
+        }
+        #navi_bar>li:hover{
+            cursor: pointer;
+        }
+        .cut_top_margin{
+            margin-top: 0;
+        }
+        div.selector_div{
+            text-align: center;
+            width: 143px;
+            display: inline-block;
+            border: 1px solid red;
+        }
+        div.selector_div span{
+            display: inline-block;
+            margin: 0;
+            border: 0;
+            padding: 0;
+            /* float:left; */
+            width: 100%;
+        }
+        .selector_horizontal select{
+            position:absolute;
+            height: min-content;
+            width: max-content;
+            width:auto;
+            margin: auto;
+            border: 0;
+            justify-content: center;
+        }
+        .noselect {
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Old versions of Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+        }
+    </style>
+    <title>Document</title>
+</head>
+<body>
+    <ul id="navi_bar" class="noselect">
+        <li id="d0">Boltzmann approximation</li>
+        <li id="d1">Hall effect</li>
+        <li id="d2">Photo-electric effect</li>
+        <li></li>
+    </ul>
+    <!-- #region test -->
+    <div class="d1">
+        <input type="text" class="n" id="n1" value=1>$\times$
+        <input type="text" class="n" id="n2" value=1>$=$
+        <span id="out">$1$</span>
+    </div>
+    <!-- #endregion -->
+
+    <!-- #region Boltzmann approximation 01-->
+    <div class="d0">
+        <p class="cut_top_margin"><b>Boltzmann approximation:</b></p>
+        <p>T: <input type="text" name="temp" id="temp" value=300>
+            <select name="semi_type" id="semi_type">
+                <option value="Si" selected>Si</option>
+                <option value="GaAs">GaAs</option>
+                <option value="Ge">Ge</option>
+            </select>
+        </p>
+        <p>$\mathrm{N_{c_{300k}}=}$<span class="N_ic"></span></p>
+        <p>$\mathrm{N_{v_{300k}}=}$<span class="N_iv"></span></p>
+
+        <p>
+            $\mathrm{N_c=2(\frac{2\pi m_n^*kT}{h^2})^{\frac{3}{2}}=\alpha^{\frac{3}{2}}\times{N_{c_{300k}}}=(}$
+            <span class="alpha_frac"></span>
+            $\mathrm{)^{\frac{3}{2}}\times(}$
+            <span class="N_ic"></span>
+            $)=$
+            <span class="N_c"></span>
+        </p>
+        <p>
+            $\mathrm{N_v=2(\frac{2\pi m_p^*kT}{h^2})^{\frac{3}{2}}=\alpha^{\frac{3}{2}}\times{N_{v_{300k}}}=(}$
+            <span class="alpha_frac"></span>
+            $)^{\frac{3}{2}}\times($
+            <span class="N_iv"></span>
+            $)=$
+            <span class="N_v"></span>
+        </p>
+        <p>$\mathrm{kT=(8.62\times10^{-5}eV/k)\times(}$<span class="T_text"></span>$)=$<span class="kT"></span></p>
+
+        <p>$\mathrm{E_g=}$<span class="E_g"></span></p>
+        <p id="n_i_long">$\mathrm{n_i=\alpha^{\frac{3}{2}}(N_{c_{300k}}N_{v_{300k}})^{\frac{1}{2}}e^{-\frac{E_g}{2kT}}}=($
+            <span class="alpha_frac"></span>
+            $\mathrm{)^{\frac{3}{2}}[(}$
+            <span class="N_ic"></span>
+            $)($
+            <span class="N_iv"></span>
+            $\mathrm{)]^{\frac{1}{2}}e}$
+            <span class="negEg_2kT"></span>
+            $=$
+            <span class="n_i"></span>
+        </p>
+        <p id="n_i_short">$\mathrm{n_i=}$<span class="n_i"></span></p>
+    <!-- #endregion -->
+
+    <!-- #region Boltzmann approximation 02-->
+        <p>solve:
+            <select name="p2_selector" id="p2_selector">
+                <option value="solve_n_o">$n_o$</option>
+                <option value="solve_E_c_E_F">$E_c-E_F$</option>
+                <option value="solve_p_o">$p_o$</option>
+                <option value="solve_E_F_E_v">$E_F-E_v$</option>
+            </select>
+
+<!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+            <span class="solve_n_o">$\mathrm{E_c-E_F=}$<input type="text" name="E_c_E_F_input" id="E_c_E_F_input" value=0.552>$\mathrm{eV}$</span>
+
+            <span class="solve_E_c_E_F">$\mathrm{n_o=}$<input type="text" name="n_o_input" id="n_o_input" value=1.5e+10>$\mathrm{cm^{-3}}$</span>
+
+            <span class="solve_p_o">$\mathrm{E_F-E_v=}$<input type="text" name="E_F_E_v_input" id="E_F_E_v_input" value=0.552>$\mathrm{eV}$</span>
+
+            <span class="solve_E_F_E_v">$\mathrm{p_o=}$<input type="text" name="p_o_input" id="p_o_input" value=1.5e+10>$\mathrm{cm^{-3}}$</span>
+
+<!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+            <p class="solve_n_o">
+                $\mathrm{n_o=\alpha^{\frac{3}{2}}N_{c_{300k}}e^{-\frac{E_c-E_F}{kT}}=((}$<span class="alpha_frac"></span>
+                $)^{\frac{3}{2}}\times($
+                <span class="N_ic"></span>
+                $\mathrm{)\times e}$
+                <span class="EcEfkt_frac"></span>
+                $)=$
+                <span class="n_o_out"></span>
+            </p>
+
+            <p class="solve_E_c_E_F">
+                $\mathrm{E_c-E_F=kTln(\frac{\alpha^{\frac{3}{2}}N_{c_{300k}}}{n_o})=(}$
+                <span class="kT"></span>
+                $\mathrm{)\times{ln(}}$
+                <span class="aNcDno_frac"></span>
+                $)=$
+                <span class="E_c_E_F_out"></span>
+            </p>
+
+            <p class="solve_p_o">
+                $\mathrm{p_o=\alpha^{\frac{3}{2}}N_{v_{300k}}e^{-\frac{E_F-E_v}{kT}}=((}$<span class="alpha_frac"></span>
+                $)^{\frac{3}{2}}\times($
+                <span class="N_iv"></span>
+                $\mathrm{)\times e}$
+                <span class="EfEvkt_frac"></span>
+                $)=$
+                <span class="p_o_out"></span>
+            </p>
+
+            <p class="solve_E_F_E_v">
+                $\mathrm{E_F-E_v=kTln(\frac{\alpha^{\frac{3}{2}}N_{v_{300k}}}{p_o})=(}$
+                <span class="kT"></span>
+                $\mathrm{)\times{ln(}}$
+                <span class="aNvDpo_frac"></span>
+                $)=$
+                <span class="E_F_E_v_out"></span>
+            </p>
+
+<!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+            <p class="solve_n_o solve_E_c_E_F">
+                $\mathrm{E_F-E_v=E_g-(E_c-E_F)=}$
+                <span class="E_g"></span>
+                $-$
+                <span class="E_c_E_F"></span>
+                $=$
+                <span class="E_F_E_v_out"></span>
+            </p>
+
+            <p class="solve_n_o solve_E_c_E_F">
+                $\mathrm{p_o=\frac{n_i^2}{n_o}=}$
+                <span class="ni2ono_frac"></span>
+                $=$
+                <span class="p_o_out"></span>
+            </p>
+
+            <p class="solve_p_o solve_E_F_E_v">
+                $\mathrm{E_c-E_F=E_g-(E_F-E_v)=}$
+                <span class="E_g"></span>
+                $-$
+                <span class="E_F_E_v"></span>
+                $=$
+                <span class="E_c_E_F_out"></span>
+            </p>
+
+            <p class="solve_p_o solve_E_F_E_v">
+                $\mathrm{n_o=\frac{n_i^2}{p_o}=}$
+                <span class="ni2opo_frac"></span>
+                $=$
+                <span class="n_o_out"></span>
+            </p>
+        </p>
+        <p id="n_o"></p>
+
+<!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+        <p>Energy level: <select name="el_selector" id="el_selector">
+            <option value="E_c_E">$E_c-E$</option>
+            <option value="E_E_v">$E-E_v$</option>
+            <option value="E">$E$</option>
+        </select>
+            <span id="E_c_E_s">$\mathrm{E_c-E=}$<input type="text" name="E_c_E" id="E_c_E_input" value=.5></span>
+            <span id="E_E_v_s">$\mathrm{E-E_v=}$<input type="text" name="E_E_v" id="E_E_v_input" value=.5></span>
+            <span id="E_s">$\mathrm{E=}$<input type="text" name="external_E" id="external_E_input" value=.5>$\mathrm{eV}$&nbsp;&nbsp;$\mathrm{E_F=}$<input type="text" name="external_fermi" id="external_fermi_input" value=.5>$\mathrm{eV}$</span>
+        <p><b>Fermi-Dirac function: </b>
+        </p>
+        <p>
+            $\mathrm{f_{FD}(E)=\frac{1}{e^{\frac{E-E_F}{kT}}+1}=}$
+            <span class="f_FD_frac"></span>
+            $=$
+            <span class="f_FD"></span>
+        </p>
+        <p>
+            $\mathrm{1-f_{FD}(E)=}$<span class="one_minus_f_FD"></span>
+        </p>
+        <!-- <p><b>Fermi-Dirac function: </b>$f_{FD}(E)=\frac{1}{e^{\frac{E-E_F}{kT}}}$</p> -->
+    <!-- #endregion -->
+    </div>
+
+    <div class="d1">
+        <span class="frequency"></span>
+    </div>
+
+    <div class="d2">
+        <p>Given: <select name="photoelectric_selector" id="photoelectric_selector">
+            <option value="wave_length">$\lambda$</option>
+            <option value="frequency">$f$</option>
+            <option value="photon_energy">$E$</option>
+            <option value="wave_number">$k$</option>
+        </select></p>
+        <div>
+            <div class="selector_div">
+                <span>wave length unit</span>
+                <select name="wl_unit_selector" id="wl_unit_selector">
+                    <option value="m">$m$</option>
+                    <option value="cm">$cm$</option>
+                    <option value="nm">$nm$</option>
+                    <option value="Å">Å</option>
+                </select>
+            </div>
+            <div class="selector_div">
+                <span>photon elergy unit</span>
+                <select name="pe_unit_selector" id="pe_unit_selector">
+                    <option value="J">$J$</option>
+                    <option value="eV">$eV$</option>
+                </select>
+            </div>
+            <div class="selector_div">
+                <span>wave number unit</span>
+                <select name="wn_unit_selector" id="wn_unit_selector">
+                    <option value="m^{-1}">$m^{-1}$</option>
+                    <option value="cm^{-1}">$cm^{-1}$</option>
+                    <option value="nm^{-1}">$nm^{-1}$</option>
+                </select>
+            </div>
+        </div>
+        
+        <span class="got_wave_length">
+            <p>wave length: $\mathrm{\lambda=}$<input type="text" name="wave_length_input" id="wave_length_input" value=7.2e-8><span class="wl_unit"></span></p>
+            <p>frequency: $\mathrm{f=\frac{c}{\lambda}=}$<span class="frequency"></span></p>
+            <p>energy of photon: $\mathrm{E=hf=}$<span class="p_energy"></span></p>
+            <p>wave number: $\mathrm{k=\frac{2\pi}{\lambda}=}$<span class="wave_number"></span></p>
+        </span>
+        <span class="got_frequency">
+            <p>frequency: $\mathrm{f=}$<input type="text" name="frequency_input" id="frequency_input" value=4.1667e+15>$\mathrm{s^{-1}}$</p>
+            <p>wave length: $\mathrm{\lambda=\frac{c}{f}=}$<span class="wave_length"></span></p>
+            <p>energy of photon: $\mathrm{E=hf=}$<span class="p_energy"></span></p>
+            <p>wave number: $\mathrm{k=\frac{2\pi}{\lambda}=}$<span class="wave_number"></span></p>
+        </span>
+        <span class="got_photon_energy">
+            <p>energy of photon: $\mathrm{E=}$<input type="text" name="photon_energy_input" id="photon_energy_input"><span class="pe_unit"></span></p>
+            <p>frequency: $\mathrm{f=\frac{E}{h}=}$<span class="frequency"></span></p>
+            <p>wave length: $\mathrm{\lambda=\frac{c}{f}=}$<span class="wave_length"></span></p>
+            <p>wave number: $\mathrm{k=\frac{2\pi}{\lambda}=}$<span class="wave_number"></span></p>
+        </span>
+        <span class="got_wave_number">
+            <p>wave number: $\mathrm{k=}$<input type="text" name="wave_number_input" id="wave_number_input"><span class="wn_unit"></span></p>
+            <p>wave length: $\mathrm{k=\frac{2\pi}{k}=}$<span class="wave_length"></span></p>
+            <p>frequency: $\mathrm{f=\frac{c}{\lambda}=}$<span class="frequency"></span></p>
+            <p>energy of photon: $\mathrm{E=hf=}$<span class="p_energy"></span></p>
+        </span>
+    </div>
+</body>
+</html>

@@ -1,0 +1,78 @@
+{
+    "R":{
+        "name":"Rydberg constant",
+        "nm":{
+            "value":1.097e-2,
+            "unit":"nm^{-1}"
+        },
+        "m":{
+            "value":1.097e+7,
+            "unit":"m^{-1}"
+        }
+    },
+    "k":{
+        "name":"Boltzmann's constant",
+        "J":{
+            "value":1.38e-23,
+            "unit":"J/K"
+        },
+        "eV":{
+            "value":8.62e-5,
+            "unit":"eV/K"
+        }
+    },
+    "c":{
+        "name":"Speed of light (vacuum)",
+        "m":{
+            "value":3.0e+8,
+            "unit":"m/s"
+        }
+    },
+    "\\epsilon_o":{
+        "name":"Permittivity constant",
+        "m":{
+            "value":8.85e-12,
+            "unit":"C^2/N-m^2"
+        },
+        "cm":{
+            "value":8.85e-14,
+            "unit":"F/cm"
+        }
+    },
+    "\\frac{1}{4\\pi\\epsilon_o}":{
+        "name":"Coulomb's constant",
+        "C":{
+            "value":8.99e+9,
+            "unit":"N-m^2/C^2"
+        }
+    },
+    "\\mu_o":{
+        "name":"Permeability constant",
+        "A":{
+            "value":1.265e-6,
+            "unit":"N/A^2"
+        }
+    },
+    "h":{
+        "name":"Planck's constant",
+        "J":{
+            "value":6.63e-34,
+            "unit":"J-s"
+        },
+        "eV":{
+            "value":4.14e-15,
+            "unit":"eV-s"
+        }
+    },
+    "\\hbar":{
+        "name":"Reduced Planck's constant",
+        "J":{
+            "value":1.05e-34,
+            "unit":"J-s"
+        },
+        "eV":{
+            "value":6.58e-16,
+            "unit":"eV-s"
+        }
+    }
+}
