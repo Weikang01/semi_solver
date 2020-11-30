@@ -4,6 +4,9 @@ function abs_log(n){
 }
 
 function expo_text(num,unit="", get_raw=false){
+    if (num==0) {
+        if (get_raw==true){return "0"} else{return "0"+unit}
+    }
     log_num = abs_log(num)
     if (log_num > -1 && log_num < 2) {
         return Math.round(num * 10000) / 10000 + unit
@@ -118,6 +121,20 @@ class item {
         this.is_frac = (Array.isArray(std_unit) && std_unit.length==2) || deci_frac
         this.deci_frac = deci_frac
         this.is_NAN = false
+        this.renew = new Object()
+    }
+
+    set_renew(obj){
+        this.renew = obj;
+        if (this.renew && this.renew[0]) {
+            if (isNaN(this.renew[0])) {
+                if (Array.isArray(this.renew[0])) {this.set_value(this.renew[0])} else{this.renew[0]()}} else{this.set_value(this.renew[0])}
+        }
+        return this;
+    }
+
+    set_value(val){
+        return this.set(val)
     }
 
     static compare_unit(cur, tar){
@@ -229,6 +246,7 @@ class item {
         this.deci_frac = item.deci_frac
         this.is_NAN = item.is_NAN
         this.renew_text_by_item_type(formate)
+        return this
     }
 
     getNaN(){
@@ -260,11 +278,13 @@ $(function(){
         }
     });
 
-    var k, h, c
+    var k, h, c, epsilon_o
     
     k = constants.k.eV.value
     h = constants.h.J.value
     c = constants.c.m.value
+    epsilon_o = constants.epsilon_o.m.value
+    epsilon_o_unit = constants.epsilon_o.m.unit
     //#endregion
     //#region formulas
     n_i_formula = new formula_ctr($("#n_i_short"),$("#n_i_long"))
@@ -276,14 +296,14 @@ $(function(){
     var $n2 = $("#n2")
     var $out = $("#out")
     
-    $n1.on("input", function(){
+    $n1.on("change", function(){
         if ($n2.val()!="") {
             res = parseFloat($n2.val())*parseFloat($n1.val())
             $out.text(ftext(expo_text(res)))
             async_renew()
         }
     })
-    $n2.on("input", function(){
+    $n2.on("change", function(){
         if ($n1.val()!="") {
             res = parseFloat($n2.val())*parseFloat($n1.val())
             $out.text(ftext(expo_text(res)))
@@ -298,59 +318,60 @@ $(function(){
     
     cur_type = "Si"
 
-    N_ic = new item($(".N_ic"), "cm^{-3}")
-    N_iv = new item($(".N_iv"), "cm^{-3}")
-    N_c = new item($(".N_c"), "cm^{-3}")
-    N_v = new item($(".N_v"), "cm^{-3}")
-    Temp = new item($(".T_text"), "K")
-    kT = new item($(".kT"), "eV")
-    E_g = new item($(".E_g"), "eV")
-    alpha = new item($(".alpha_frac"), "")
+    N_ic = new item($(".N_ic"), "cm^{-3}").set(semi_prop.Si.N_ic)
+    N_iv = new item($(".N_iv"), "cm^{-3}").set(semi_prop.Si.N_iv)
+    N_c = new item($(".N_c"), "cm^{-3}").set(semi_prop.Si.N_ic)
+    N_v = new item($(".N_v"), "cm^{-3}").set(semi_prop.Si.N_iv)
+    Temp = new item($(".T_text"), "K").set(300)
+    kT = new item($(".kT"), "eV").set(k*Temp.val)
+    E_g = new item($(".E_g"), "eV").set(semi_prop.Si.E_g)
+    alpha = new item($(".alpha_frac"), "").set(1)
     alpha_3o2 = 1
-    negEg_2kT = new item($(".negEg_2kT"), "")
-    n_i = new item($(".n_i"), "cm^{-3}")
+    negEg_2kT = new item($(".negEg_2kT"), "").set(-E_g.val/(2*kT.val), 1)
+    n_i = new item($(".n_i"), "cm^{-3}").set(semi_prop.Si.n_i)
+    
     //#endregion
 
     // #region p2 vars
-    E_c_E_F_input = new item($("#E_c_E_F_input"), "eV")
+    E_c_E_F_input = new item($("#E_c_E_F_input"), "eV").set(.552)
     $E_c_E_F_input = $("#E_c_E_F_input")
     E_c_E_F_out = new item($(".E_c_E_F_out"), "eV")
-    E_c_E_F = new item($(".E_c_E_F"), "eV")
+    E_c_E_F = new item($(".E_c_E_F"), "eV").set(.552)
 
-    E_F_E_v_input = new item($("#E_F_E_v_input", "eV"))
+    E_F_E_v_input = new item($("#E_F_E_v_input", "eV")).set(.552)
     $E_F_E_v_input = $("#E_F_E_v_input")
     E_F_E_v_out = new item($(".E_F_E_v_out"), "eV")
-    E_F_E_v = new item($(".E_F_E_v"), "eV")
+    E_F_E_v = new item($(".E_F_E_v"), "eV").set(.552)
 
-    n_o_input = new item($("#n_o_input"), "cm^{-3}")
+    n_o_input = new item($("#n_o_input"), "cm^{-3}").set(1.5e+10)
     $n_o_input = $("#n_o_input")
     n_o_out = new item($(".n_o_out"), "cm^{-3}")
 
-    p_o_input = new item($("#p_o_input"), "cm^{-3}")
+    p_o_input = new item($("#p_o_input"), "cm^{-3}").set(1.5e+10)
     $p_o_input = $("#p_o_input")
     p_o_out = new item($(".p_o_out"), "cm^{-3}")
 ///////////////////////////////////////////////////////////////////////////
-    aNcDno_frac = new item($(".aNcDno_frac"), "cm^{-3}", true)
-    EcEfkt_frac = new item($(".EcEfkt_frac"), "eV", true)
+    aNcDno_frac = new item($(".aNcDno_frac"), "cm^{-3}", true).set([semi_prop.Si.N_ic, 1.5e+10])
+    EcEfkt_frac = new item($(".EcEfkt_frac"), "eV", true).set([-.552, kT.val], 1)
 
     aNvDpo_frac = new item($(".aNvDpo_frac"), "cm^{-3}", true)
-    EfEvkt_frac = new item($(".EfEvkt_frac"), "eV", true)
+    EfEvkt_frac = new item($(".EfEvkt_frac"), "eV", true).set([-.552, kT.val], 1)
 ///////////////////////////////////////////////////////////////////////////
-    E_F_E_v_out = new item($(".E_F_E_v_out"), "eV")
-    ni2ono_frac = new item($(".ni2ono_frac"), "cm^{-3}", true)
-    p_o_out = new item($(".p_o_out"), "cm^{-3}")
-
-    E_c_E_F_out = new item($(".E_c_E_F_out"), "eV")
-    ni2opo_frac = new item($(".ni2opo_frac"), "cm^{-3}", true)
-    n_o_out = new item($(".n_o_out"), "cm^{-3}")
+    E_F_E_v_out = new item($(".E_F_E_v_out"), "eV").set(E_g.val-E_c_E_F.val)
+    
+    E_c_E_F_out = new item($(".E_c_E_F_out"), "eV").set(E_g.val-E_F_E_v.val)
+    n_o_out = new item($(".n_o_out"), "cm^{-3}").set(N_c.val*Math.exp(EcEfkt_frac.val))
+    ni2ono_frac = new item($(".ni2ono_frac"), "cm^{-3}", true).set([n_i.val*n_i.val, n_o_out.val])
+    p_o_out = new item($(".p_o_out"), "cm^{-3}").set(ni2ono_frac.val)
+    ni2opo_frac = new item($(".ni2opo_frac"), "cm^{-3}", true).set([n_i.val*n_i.val, p_o_out.val])
     //#endregion
 //////////////////////////////////////////////////////////////////// f_FD //
-    EcminusEf = 0
-    E_Ef_val = 0
+    EcminusEf = E_c_E_F.val
+    E_Ef_val = EcminusEf-0.5
 
-    f_FD_frac = new item($(".f_FD_frac"), "", true)
-    f_FD = new item($(".f_FD"), "")
-    one_minus_f_FD = new item($(".one_minus_f_FD", ""))
+    f_FD_frac = new item($(".f_FD_frac"), "", true).set([1,Math.exp(E_Ef_val/kT.val)+1])
+    f_FD = new item($(".f_FD"), "").set(f_FD_frac.val)
+    one_minus_f_FD = new item($(".one_minus_f_FD", "")).set(1-f_FD.val)
 
     $E_c_E_input = $("#E_c_E_input")
     $E_E_v_input = $("#E_E_v_input")
@@ -368,50 +389,8 @@ $(function(){
     $el_selector = $("#el_selector")
     var el_values = $.map($('#el_selector option'),function(e){return e.value;});
     var cur_el_selection = el_values[0]
-///////////////////////////////////////////////////////////////////////////
-    function initiate(){
-    N_ic.set(semi_prop.Si.N_ic)
-    N_c.set(semi_prop.Si.N_ic)
-    N_iv.set(semi_prop.Si.N_iv)
-    N_v.set(semi_prop.Si.N_iv)
-    E_g.set(semi_prop.Si.E_g)
-    Temp.set(300)
-    kT.set(k*300)
-    alpha.set(1)
-    negEg_2kT.set(-E_g.val/(2*kT.val), 1)
-    n_i.set(semi_prop.Si.n_i)
-    //#endregion
-    
-    //#region p2
-    EcEfkt_frac.set([-.552, kT.val], 1)
-    n_o_out.set(N_c.val*Math.exp(EcEfkt_frac.val))
-    ni2ono_frac.set([n_i.val*n_i.val, n_o_out.val])
-    p_o_out.set(ni2ono_frac.val)
-    aNcDno_frac.set([semi_prop.Si.N_ic, 1.5e+10])
-    
-    EfEvkt_frac.set([-.552, kT.val], 1)
-    ni2opo_frac.set([n_i.val*n_i.val, p_o_out.val])
-    aNcDno_frac.set([semi_prop.Si.N_ic, 1.5e+10])
-    ///////////////////////////////////////////////////////////////////////////
-    E_c_E_F_input.set(.552)
-    n_o_input.set(1.5e+10)
-    E_c_E_F.set(.552)
-    E_F_E_v_out.set(E_g.val-E_c_E_F.val)
-    
-    E_F_E_v_input.set(.552)
-    p_o_input.set(1.5e+10)
-    E_F_E_v.set(.552)
-    E_c_E_F_out.set(E_g.val-E_F_E_v.val)
-    ///////////////////////////////////////////////////////////////////////////
-    EcminusEf = E_c_E_F.val
-    E_Ef_val = EcminusEf-0.5
-    f_FD_frac.set([1,Math.exp(E_Ef_val/kT.val)+1])
-    f_FD.set(f_FD_frac.val)
-    one_minus_f_FD.set(1-f_FD.val)
-    ///////////////////////////////////////////////////////////////////////////
-    //#endregion
     async_renew()
-    }
+
     function refresh_T(){
         kT.set(k*Temp.val)
         alpha.set([Temp.val, 300])
@@ -431,6 +410,8 @@ $(function(){
         EcEfkt_frac.set([-.552, kT.val], 1)
         n_o_out.set(N_c.val*Math.exp(EcEfkt_frac.val))
         aNcDno_frac.set([N_c.val, 1.5e+10])
+        refresh_fd_Na()
+        refresh_fd_Nd()
     }
     function refresh_solve_p_o(){
         E_F_E_v.set(E_F_E_v_input.val)
@@ -489,7 +470,6 @@ $(function(){
         f_FD.set(f_FD_frac.val)
         one_minus_f_FD.set(1-f_FD_frac.val)
     }
-    initiate()
     $semi_type.on("change", function(){
         // #region p1
         cur_type = this.value
@@ -511,9 +491,13 @@ $(function(){
         // #region p2
         refresh_data_p2()
         refresh_data_el()
+        refresh_fd_Na()
+        refresh_fd_Nd()
+        dielectric_constant.set(semi_prop[this.value].dielectric_constant)
+        epsilon_s.set(epsilon_o.val*semi_prop[this.value].dielectric_constant)
         async_renew()
     })
-    $T.on("input", function(){
+    $T.on("change", function(){
         if (Temp.getNaN() || Temp.val<0) {Temp.set(0)}
         Temp.set(this.value)
         refresh_T()
@@ -532,24 +516,24 @@ $(function(){
         refresh_data_p2()
         async_renew()
     })
-    $n_o_input.on("input", function(){
+    $n_o_input.on("change", function(){
         if (n_o_input.val<=0) {n_o_input.set(1.5e+10)}
         n_o_input.set(parseFloat(this.value))
         refresh_solve_E_c_E_F()
         async_renew()
     })
-    $E_c_E_F_input.on("input", function(){
+    $E_c_E_F_input.on("change", function(){
         E_c_E_F_input.set(parseFloat(this.value))
         refresh_solve_n_o()
         async_renew()
     })
-    $p_o_input.on("input", function(){
+    $p_o_input.on("change", function(){
         if (p_o_input.val<=0) {p_o_input.set(1.5e+10)}
         p_o_input.set(parseFloat(this.value))
         refresh_solve_E_F_E_v()
         async_renew()
     })
-    $E_F_E_v_input.on("input", function(){
+    $E_F_E_v_input.on("change", function(){
         E_F_E_v_input.set(parseFloat(this.value))
         refresh_solve_p_o()
         async_renew()
@@ -562,29 +546,266 @@ $(function(){
         refresh_data_el()
         async_renew()
     })
-    $E_c_E_input.on("input", function(){
+    $E_c_E_input.on("change", function(){
         E_c_E_input_val = parseFloat(this.value)
         refresh_data_el()
         async_renew()
     })
-    $E_E_v_input.on("input", function(){
+    $E_E_v_input.on("change", function(){
         E_E_v_input_val = parseFloat(this.value)
         refresh_data_el()
         async_renew()
     })
-    $external_E_input.on("input", function(){
+    $external_E_input.on("change", function(){
         external_E_input_val = parseFloat(this.value)
         refresh_data_el()
         async_renew()
     })
-    $external_fermi_input.on("input", function(){
+    $external_fermi_input.on("change", function(){
         external_fermi_input_val = parseFloat(this.value)
         refresh_data_el()
         async_renew()
     })
     //#endregion
 
-    //#region photoelectric effect 
+    //#region fermi-dirac function
+    $Na_input = $("#Na_input")
+    $Nd_input = $("#Nd_input")
+    Na_m3 = new item($(".Na_m3"), "m^{-3}").set(1.5e+16)
+    Nd_m3 = new item($(".Nd_m3"), "m^{-3}").set(1.5e+16)
+    Na_ni_frac = new item($(".Na_ni_frac"),"cm^{-3}", true).set([1.5e+10,1.5e+10])
+    Ei_Efp = new item($(".Ei_Efp"),"eV").set(0)
+    Nd_ni_frac = new item($(".Nd_ni_frac"),"cm^{-3}", true).set([1.5e+10,1.5e+10])
+    Efn_Efi = new item($(".Efn_Efi"),"eV").set(0)
+
+    NdNa_ni2_frac = new item($(".NdNa_ni2_frac"), "cm^{-3}", true).set([2.25e+20,2.25e+20])
+    V_o = new item($(".V_o"), "V").set(0)
+    Ei = new item($(".Ei"), "eV").set(0)
+
+    eV_val = unit_conv.eV.J
+
+    epsilon_o = new item($(".epsilon_o"), epsilon_o_unit).set(epsilon_o)
+    dielectric_constant = new item($(".dielectric_constant"), "").set(semi_prop.Si.dielectric_constant)
+    epsilon_s = new item($(".epsilon_s"), epsilon_o_unit).set(epsilon_o.val*semi_prop.Si.dielectric_constant)
+    twoepsilonvo_over_e_frac = new item($(".twoepsilonvo_over_e_frac"), ["","J"],true).set([2*epsilon_s.val*V_o.val, eV_val])
+    NaplusNd_over_NaNd_frac = new item($(".NaplusNd_over_NaNd_frac"), "m^{-3}", true).set([Na_m3.val+Nd_m3.val, Na_m3.val*Nd_m3.val])
+
+    W = new item($(".W"), "m").set(Math.pow(twoepsilonvo_over_e_frac.val*NaplusNd_over_NaNd_frac.val, 1/2))
+    Na_over_NaplusNd = new item($(".Na_over_NaplusNd"), "m^{-3}",true).set([Na_m3.val, Na_m3.val+Nd_m3.val])
+    x_n = new item($(".x_n"), "m").set(Na_over_NaplusNd.val*W.val)
+    x_p  = new item($(".x_p"), "m").set(W.val-x_n.val)
+
+    eNdxn_over_epsilons_frac = new item($(".eNdxn_over_epsilons_frac"), ["J-m^{-2}",epsilon_o_unit], true).set([-eV_val*Nd_m3.val*x_n.val,epsilon_s.val])
+    electric_field = new item($(".electric_field"), "V/m").set(eNdxn_over_epsilons_frac.val)
+
+    $cross_sectional_area_input = $(".cross_sectional_area_input")
+    cross_sectional_area_input = new item($(".cross_sectional_area_input"), "m^2")
+    $cross_sectional_area_unit = $(".cross_sectional_area_unit").text(ftext(cross_sectional_area_input.rep_unit))
+
+    electric_energy = new item($(".electric_energy"), "J").set(eV_val)
+    cross_sectional_area = new item($(".cross_sectional_area"), "m^2").set(1e-6)
+    charge = new item($(".charge"), "C").set(-electric_energy.val*Na_m3.val*cross_sectional_area.val*x_p.val)
+    async_renew()
+    function refresh_fd_Na(){
+        Na_ni_frac.set([$Na_input.val(),n_i.val])
+        Ei_Efp.set(kT.val*Math.log(Na_ni_frac.val))
+        NdNa_ni2_frac.set([$Na_input.val()*$Nd_input.val(), n_i.val*n_i.val])
+        V_o.set(kT.val*Math.log(NdNa_ni2_frac.val))
+        Ei.set(kT.val*Math.log(NdNa_ni2_frac.val))
+        Na_m3.set($Na_input.val()*(10**6))
+        twoepsilonvo_over_e_frac.set([2*epsilon_s.val*V_o.val, eV_val])
+        NaplusNd_over_NaNd_frac.set([Na_m3.val+Nd_m3.val, Na_m3.val*Nd_m3.val])
+        W.set(Math.pow(twoepsilonvo_over_e_frac.val*NaplusNd_over_NaNd_frac.val, 1/2))
+        Na_over_NaplusNd.set([Na_m3.val, Na_m3.val+Nd_m3.val])
+        x_n.set(Na_over_NaplusNd.val*W.val)
+        x_p.set(W.val-x_n.val)
+
+        eNdxn_over_epsilons_frac.set([-eV_val*Nd_m3.val*x_n.val,epsilon_s.val])
+        electric_field.set(eNdxn_over_epsilons_frac.val)
+        charge.set(-electric_energy.val*Na_m3.val*cross_sectional_area.val*x_p.val)
+        async_renew()
+    }
+    function refresh_fd_Nd(){
+        Nd_ni_frac.set([$Nd_input.val(),n_i.val])
+        Efn_Efi.set(kT.val*Math.log(Nd_ni_frac.val))
+        NdNa_ni2_frac.set([$Na_input.val()*$Nd_input.val(), n_i.val*n_i.val])
+        V_o.set(kT.val*Math.log(NdNa_ni2_frac.val))
+        Ei.set(kT.val*Math.log(NdNa_ni2_frac.val))
+        Nd_m3.set($Nd_input.val()*(10**6))
+        twoepsilonvo_over_e_frac.set([2*epsilon_s.val*V_o.val, eV_val])
+        NaplusNd_over_NaNd_frac.set([Na_m3.val+Nd_m3.val, Na_m3.val*Nd_m3.val])
+        W.set(Math.pow(twoepsilonvo_over_e_frac.val*NaplusNd_over_NaNd_frac.val, 1/2))
+        Na_over_NaplusNd.set([Na_m3.val, Na_m3.val+Nd_m3.val])
+        x_n.set(Na_over_NaplusNd.val*W.val)
+        x_p.set(W.val-x_n.val)
+        
+        eNdxn_over_epsilons_frac.set([-eV_val*Nd_m3.val*x_n.val,epsilon_s.val])
+        electric_field.set(eNdxn_over_epsilons_frac.val)
+        charge.set(-electric_energy.val*Na_m3.val*cross_sectional_area.val*x_p.val)
+        async_renew()
+    }
+    $Na_input.on("change", function(){
+        refresh_fd_Na()
+    })
+    $Nd_input.on("change", function(){
+        Nd_ni_frac.set([this.value,this.n_i])
+        refresh_fd_Nd()
+    })
+    $cross_sectional_area_input.on("change", function(){
+        charge.set(-electric_energy.val*Na_m3.val*cross_sectional_area.val*x_p.val)
+        async_renew()
+    })
+    //#endregion
+
+    //#region hall-fct function
+    B_z = new item($(".B_z"), "T").set_renew({
+        0:5e-2,
+        "EH_over_vx_frac":function(){B_z.set(EH_over_vx_frac.val)}
+    })
+    E_H = new item($(".E_H"), "V/m").set_renew({
+        0:62.5,
+        "v_xB_z":function(){E_H.set(v_x.val*B_z.val)},
+    })
+    W = new item($(".W"), "m").set_renew({
+        0:1e-4,
+    })
+    L = new item($(".L"), "m").set_renew({
+        0:1e-3,
+    })
+    d = new item($(".d"), "m").set_renew({
+        0:1e-5,
+    })
+    V_H = new item($(".V_H"), "V").set_renew({
+        0:-6.25e-3,
+        "IxBz_over_ned_frac":function(){V_H.set(-IxBz_over_ned_frac.val)},
+        "E_HW":function(){V_H.set(-E_H.val*W.val)},
+        "v_xWB_z":function(){V_H.set(-v_x.val*W.val*B_z.val)},
+    })
+    v_x = new item($(".v_x"), "m/s").set_renew({
+        0:1250,
+        "jx_over_en_frac": function(){if(jx_over_en_frac){v_x.set(jx_over_en_frac.val);}},
+        "ix_over_enWd_frac":function(){if(ix_over_enWd_frac){v_x.set(ix_over_enWd_frac.val);}}})
+    Volt_x = new item($(".Volt_x"), "V").set_renew({
+        0:12.5,
+    })
+    J_x = new item($(".J_x"), "N-m").set_renew({
+        0:1e+6,
+        "ix_over_Wd_frac":function(){J_x.set(ix_over_Wd_frac.val)}
+    })
+    I_x = new item($(".I_x"), "A").set_renew({
+        0:1e-3,
+        "WdenmuVolt_x_over_L_frac":function(){I_x.set(WdenmuVolt_x_over_L_frac.val)}
+    })
+    n = new item($(".n"), "m^{-3}").set_renew({
+        0:5e+21,
+        "jx_over_vxe_frac":function(){n.set(jx_over_vxe_frac.val)}
+    })
+    mu = new item($(".mu"), "m^2/V-s").set_renew({
+        0:.1,
+        "IxL_over_enVxWd_frac":function(){mu.set(IxL_over_enVxWd_frac.val)}
+    })
+
+    jx_over_vxe_frac = new item($(".jx_over_vxe_frac"), [J_x.rep_unit, "J-m^{-3}"], true)
+    jx_over_vxe_frac.set_renew({0: function(){jx_over_vxe_frac.set([J_x.val, Volt_x.val*eV_val])}})
+
+    jx_over_en_frac = new item($(".jx_over_en_frac"), [J_x.rep_unit, "J-m^{-3}"], true)
+    jx_over_en_frac.set_renew({0: function(){jx_over_en_frac.set([J_x.val, n.val*eV_val])}})
+
+    ix_over_enWd_frac = new item($(".ix_over_enWd_frac"), ["A", "J-m"], true)
+    ix_over_enWd_frac.set_renew({0: function(){ix_over_enWd_frac.set([I_x.val, eV_val*n.val*W.val*d.val])}})
+
+    EH_over_vx_frac = new item($(".EH_over_vx_frac"), ["V/m", "m/s"], true)
+    EH_over_vx_frac.set_renew({0: function(){EH_over_vx_frac.set([E_H.val, v_x.val])}})
+
+    IxBz_over_ned_frac = new item($(".IxBz_over_ned_frac"), ["A-V/m","J-m^{-2}"], true)
+    IxBz_over_ned_frac.set_renew({0: function(){IxBz_over_ned_frac.set([-I_x.val*B_z.val, n.val*eV_val*d.val])}})
+
+    WdenmuVolt_x_over_L_frac = new item($(".WdenmuVolt_x_over_L_frac"), ["m^4C/s","m"], true)
+    WdenmuVolt_x_over_L_frac.set_renew({0: function(){WdenmuVolt_x_over_L_frac.set([W.val*d.val*eV_val*n.val*mu.val*Volt_x.val, L.val])}})
+
+    ix_over_Wd_frac = new item($(".ix_over_Wd_frac"), ["A","m^2"], true)
+    ix_over_Wd_frac.set_renew({0: function(){ix_over_Wd_frac.set([I_x.val,W.val*d.val])}})
+
+    ixbz_over_edVH_frac = new item($(".ixbz_over_edVH_frac"), ["A-V/m","V-m^{-2}"], true)
+    ixbz_over_edVH_frac.set_renew({0: function(){ixbz_over_edVH_frac.set([I_x.val*B_z.val,eV_val*V_H.val*d.val])}})
+
+    IxL_over_enVxWd_frac = new item($(".IxL_over_enVxWd_frac"), ["A-m","J^2/C"], true)
+    IxL_over_enVxWd_frac.set_renew({0: function(){IxL_over_enVxWd_frac.set([I_x.val*L.val, eV_val*n.val*Volt_x.val*W.val*d.val])}})
+
+    var value_set = { "W":W, "L":L, "d":d, "V_H":V_H, "n":n, "B_z":B_z, "E_H":E_H, "v_x":v_x, "J_x":J_x, "I_x":I_x, "Volt_x":Volt_x, "mu":mu,}
+    var value_set_array = Object.keys(value_set)
+    for (let index = 0; index < value_set_array.length; index++) {
+        var cur_val = value_set_array[index]
+        $(".unit_"+cur_val).text(ftext(value_set[cur_val].rep_unit))
+    }
+
+    var item_set = { "W":W, "L":L, "d":d, "V_H":V_H, "n":n, "B_z":B_z, "E_H":E_H, "v_x":v_x, "J_x":J_x, "I_x":I_x, "Volt_x":Volt_x, "mu":mu, "jx_over_vxe_frac":jx_over_vxe_frac, "jx_over_en_frac":jx_over_en_frac, "ix_over_enWd_frac":ix_over_enWd_frac, "EH_over_vx_frac":EH_over_vx_frac, "IxBz_over_ned_frac":IxBz_over_ned_frac, "WdenmuVolt_x_over_L_frac":WdenmuVolt_x_over_L_frac, "ix_over_Wd_frac":ix_over_Wd_frac, "ixbz_over_edVH_frac":ixbz_over_edVH_frac, "IxL_over_enVxWd_frac":IxL_over_enVxWd_frac}
+    
+    $("[id^=input_]").on("change", function(){
+        input_cls_name = $(this).attr('id')
+        input_v_name = input_cls_name.substr(input_cls_name.indexOf("_")+1)
+        value_set[input_v_name].set($(this).val())
+
+        $(".horizontal_button_list_disabled").each(function(){
+            disabled_cls_name = $(this).attr('class').split(' ')[0]
+            disabled_v_name = disabled_cls_name.substr(disabled_cls_name.indexOf("_")+1)
+            
+            renew_func_name = ''
+            $(".pnsolve_"+disabled_v_name+":visible > span").each(function(){
+                satisfied_v_name = $(this).attr('class').split(' ')[0]
+                if (disabled_v_name == satisfied_v_name) {
+                    console.log(renew_func_name)
+                    item_set[satisfied_v_name].renew[renew_func_name]()
+                }
+                else if (satisfied_v_name.indexOf("_frac")>=0) {
+                    item_set[satisfied_v_name].renew[0]()
+                    renew_func_name += satisfied_v_name
+                } else{
+                    renew_func_name += satisfied_v_name
+                }
+            })
+            
+        })
+        async_renew()
+        // var classList = $(this).attr('class').split(/\s+/);
+        // target_cls_name = $($(".horizontal_button_list_actived")).attr("class").split(' ')[0]
+        // target_v_name = target_cls_name.substr(target_cls_name.indexOf("_")+1)
+        // console.log(input_cls_name)
+    })
+
+    // $input_W.on("change", function(){
+        
+        // W.set(input_W.val())
+        // V_H.set(-E_H.val*W.val)
+        // ix_over_enWd_frac.set([I_x.val, eV_val*n.val*W.val*d.val])
+        // v_x.set(ix_over_enWd_frac.val)
+        // ix_over_Wd_frac.set([I_x.val,W.val*d.val])
+        
+        // jx_over_vxe_frac.set([J_x.val, Volt_x.val*eV_val])
+        // jx_over_en_frac.set([J_x.val, n.val*eV_val])
+        // IxBz_over_ned_frac.set([-I_x.val*B_z.val, n.val*eV_val*d.val])
+        // EH_over_vx_frac.set([E_H.val, v_x.val])
+        // WdenmuVolt_x_over_L_frac.set([W.val*d.val*eV_val*n.val*mu.val*Volt_x.val, L.val])
+        // ixbz_over_edVH_frac.set([I_x.val*B_z.val,eV_val*V_H.val*d.val])
+        // IxL_over_enVxWd_frac.set([I_x.val*L.val, eV_val*n.val*Volt_x.val*W.val*d.val])
+    // })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //#endregion
+    //#region photoelectric-effect 
     $photoelectric_selector = $("#photoelectric_selector")
     var pe_values = $.map($('#photoelectric_selector option'),function(e){return e.value;});
     var cur_pe_selection = pe_values[0]
@@ -599,43 +820,30 @@ $(function(){
         })
     })
 
-    $wl_unit = $(".wl_unit")
-    $pe_unit = $(".pe_unit")
-    $wn_unit = $(".wn_unit")
-    
     $wl_unit_selector = $("#wl_unit_selector")
     $pe_unit_selector = $("#pe_unit_selector")
     $wn_unit_selector = $("#wn_unit_selector")
 
     $wave_length_input = $("#wave_length_input")
-    wave_length_input = new item($("#wave_length_input"), "m")
-    wave_length = new item($(".wave_length"), "m")
-
+    wave_length_input = new item($("#wave_length_input"), "m").set(7.2e-8)
+    wave_length = new item($(".wave_length"), "m").copy(wave_length_input)
     $frequency_input = $("#frequency_input")
-    frequency_input = new item($("#frequency_input"), "s^{-1}")
-    frequency = new item($(".frequency"), "s^{-1}")
+    frequency_input = new item($("#frequency_input"), "s^{-1}").set(c/wave_length_input.val)
+    frequency = new item($(".frequency"), "s^{-1}").copy(frequency_input)
 
     $photon_energy_input = $("#photon_energy_input")
-    photon_energy_input = new item($("#photon_energy_input"), "J")
-    p_energy = new item($(".p_energy"), "J")
+    photon_energy_input = new item($("#photon_energy_input"), "J").set(h*frequency_input.val)
+    p_energy = new item($(".p_energy"), "J").copy(photon_energy_input)
 
     $wave_number_input = $("#wave_number_input")
-    wave_number_input = new item($("#wave_number_input"), "m^{-1}")
-    wave_number = new item($(".wave_number"), "m^{-1}")
+    wave_number_input = new item($("#wave_number_input"), "m^{-1}").set((2*Math.PI)/wave_length_input.val)
+    wave_number = new item($(".wave_number"), "m^{-1}").copy(wave_number_input)
 
-    function div2_initialize(){
-        $wl_unit.text(ftext(wave_length.rep_unit))
-        $pe_unit.text(ftext(p_energy.rep_unit))
-        $wn_unit.text(ftext(wave_number.rep_unit))
+    $wl_unit = $(".wl_unit").text(ftext(wave_length_input.rep_unit))
+    $pe_unit = $(".pe_unit").text(ftext(photon_energy_input.rep_unit))
+    $wn_unit = $(".wn_unit").text(ftext(wave_number_input.rep_unit))
+    async_renew()
 
-        wave_length.copy(wave_length_input.set(7.2e-8))
-        frequency.copy(frequency_input.set(c/wave_length.val))
-        p_energy.copy(photon_energy_input.set(h*frequency.val))
-        wave_number.copy(wave_number_input.set((2*Math.PI)/wave_length.val))
-
-        async_renew()
-    }
-    div2_initialize()
     $wl_unit_selector.on("change", function(){
         wave_length_input.change_unit(this.value)
         wave_length.change_unit(this.value)
@@ -655,32 +863,110 @@ $(function(){
         async_renew()
     })
 
-    $wave_length_input.on("input", function(){
-
+    $wave_length_input.on("change", function(){
         wave_length.copy(wave_length_input.set(this.value, 0, true))
         frequency.copy(frequency_input.set(c/wave_length.val))
         p_energy.copy(photon_energy_input.set(h*frequency.val))
         wave_number.copy(wave_number_input.set((2*Math.PI)/wave_length.val))
         async_renew()
     })
-    $frequency_input.on("input", function(){
+    $frequency_input.on("change", function(){
         frequency.copy(frequency_input.set(this.value, 0, true))
         wave_length.copy(wave_length_input.set(c/frequency.val))
         p_energy.copy(photon_energy_input.set(h*frequency.val))
         wave_number.copy(wave_number_input.set((2*Math.PI)/wave_length.val))
         async_renew()
     })
-    $photon_energy_input.on("input", function(){
+    $photon_energy_input.on("change", function(){
         p_energy.copy(photon_energy_input.set(this.value, 0, true))
         frequency.copy(frequency_input.set(p_energy.val/h))
         wave_length.copy(wave_length_input.set(c/frequency.val))
         wave_number.copy(wave_number_input.set((2*Math.PI)/wave_length.val))
     })
-    $wave_number_input.on("input", function(){
+    $wave_number_input.on("change", function(){
         wave_number.set(wave_number_input.set(this.value, 0, true))
         wave_length.copy(wave_number_input.set((2*Math.PI)/wave_number.val))
         wave_length.copy(wave_length_input.set(c/frequency.val))
         p_energy.copy(photon_energy_input.set(h*frequency.val))
     })
-    //endregion
+    //#endregion
+
+    lattice_constant_input = new item($("#lattice_constant_input"), "Å").set(semi_prop.Si.lattice_constant)
+    lattice_constant_in_m_input = new item($("#lattice_constant_in_m_input"), "m").set(semi_prop.Si.lattice_constant*unit_conv.Å.m)
+    atomic_weight_input = new item($("#atomic_weight_input"), "u").set(semi_prop.Si.weight)
+    atomic_weight_in_kg_input = new item($("#atomic_weight_in_kg_input"), "kg").set(semi_prop.Si.weight*unit_conv.u.kg)
+
+    lattice_constant = new item($(".lattice_constant"), "Å").copy(lattice_constant_input)
+    lattice_constant_in_m = new item($(".lattice_constant_in_m"), "m").copy(lattice_constant_in_m_input)
+    atomic_weight = new item($(".atomic_weight"), "u").copy(atomic_weight_input)
+    atomic_weight_in_kg = new item($(".atomic_weight_in_kg"), "kg").copy(atomic_weight_in_kg_input)
+    
+    N_over_V = new item($(".N_over_V"), ["","m^3"], true)
+    N_over_V.set_renew({
+        0: function(){N_over_V.set([8,lattice_constant_in_m.val**3])}
+    })
+    M_over_V = new item($(".M_over_V"), ["kg","m^3"], true)
+    M_over_V.set_renew({
+        0: function(){M_over_V.set([atomic_weight_in_kg.val*8,lattice_constant_in_m.val**3])}
+    })
+    volumn_density = new item($(".volumn_density"), "m^{-3}").set(N_over_V.val)
+    mass_density = new item($(".mass_density"), "kg/m^3").set(M_over_V.val)
+
+    //#region Crystal structure
+    $("#semi_crystal_selector").on("change", function(){
+        var cur_semi = $(this).val()
+        if (cur_semi !="other") {
+            $(".notchoose_other").show()
+            $(".choose_other").hide()
+            $(".lattice_constant").text(ftext())
+            lattice_constant.set(semi_prop[cur_semi].lattice_constant)
+            lattice_constant_in_m.set(semi_prop[cur_semi].lattice_constant/unit_conv.m.Å)
+            N_over_V.renew[0]()
+            M_over_V.renew[0]()
+            volumn_density.set(N_over_V.val)
+            mass_density.set(M_over_V.val)
+            async_renew()
+        } else{
+            $(".choose_other").show()
+            $(".notchoose_other").hide()
+        }
+    })
+
+    $("#lattice_constant_input").on("change", function(){
+        lattice_constant_input.set($(this).val())
+        lattice_constant_in_m_input.set($(this).val()*unit_conv.Å.m)
+        lattice_constant.set($(this).val())
+        lattice_constant_in_m.set($(this).val()*unit_conv.Å.m)
+        N_over_V.renew[0]()
+        M_over_V.renew[0]()
+        async_renew()
+    })
+    $("#lattice_constant_in_m_input").on("change", function(){
+        lattice_constant_in_m_input.set($(this).val())
+        lattice_constant_input.set($(this).val()*unit_conv.m.Å)
+        lattice_constant_in_m.set($(this).val())
+        lattice_constant.set($(this).val()*unit_conv.m.Å)
+        N_over_V.renew[0]()
+        M_over_V.renew[0]()
+        async_renew()
+    })
+    $("#atomic_weight_input").on("change", function(){
+        atomic_weight_input.set($(this).val())
+        atomic_weight_in_kg_input.set($(this).val()*unit_conv.u.kg)
+        atomic_weight.set($(this).val())
+        atomic_weight_in_kg.set($(this).val()*unit_conv.u.kg)
+        N_over_V.renew[0]()
+        M_over_V.renew[0]()
+        async_renew()
+    })
+    $("#atomic_weight_in_kg_input").on("change", function(){
+        atomic_weight_in_kg_input.set($(this).val())
+        atomic_weight_input.set($(this).val()*unit_conv.kg.u)
+        atomic_weight_in_kg.set($(this).val())
+        atomic_weight.set($(this).val()*unit_conv.kg.u)
+        N_over_V.renew[0]()
+        M_over_V.renew[0]()
+        async_renew()
+    })
+    //#endregion
 })

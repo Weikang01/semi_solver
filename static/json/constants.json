@@ -28,7 +28,7 @@
             "unit":"m/s"
         }
     },
-    "\\epsilon_o":{
+    "epsilon_o":{
         "name":"Permittivity constant",
         "m":{
             "value":8.85e-12,
@@ -39,14 +39,14 @@
             "unit":"F/cm"
         }
     },
-    "\\frac{1}{4\\pi\\epsilon_o}":{
+    "frac{1}{4piepsilon_o}":{
         "name":"Coulomb's constant",
         "C":{
             "value":8.99e+9,
             "unit":"N-m^2/C^2"
         }
     },
-    "\\mu_o":{
+    "mu_o":{
         "name":"Permeability constant",
         "A":{
             "value":1.265e-6,
@@ -64,7 +64,7 @@
             "unit":"eV-s"
         }
     },
-    "\\hbar":{
+    "hbar":{
         "name":"Reduced Planck's constant",
         "J":{
             "value":1.05e-34,

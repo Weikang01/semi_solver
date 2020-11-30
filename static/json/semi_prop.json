@@ -1,38 +1,44 @@
 {
     "Si":
     {
-        "#cm-3":5.0e+22,
+        "atoms_per_cm_3":5.0e+22,
         "weight":28.09,
-        "Lattice Constant":5.43,
+        "crystal_structure":"Diamond",
+        "dielectric_constant":11.7,
+        "lattice_constant":5.43,
         "E_g":1.12,
         "N_ic":2.8e+19,
         "N_iv":1.04e+19,
         "n_i":1.5e+10,
-        "\\mu_n":1350,
-        "\\mu_p":480
+        "mu_n":1350,
+        "mu_p":480
     },
     "GaAs":
     {
-        "#cm-3":4.42e+22,
-        "weight":144.63,
-        "Lattice Constant":5.65,
+        "atoms_per_cm_3":4.42e+22,
+        "weight":72.32,
+        "crystal_structure":"Zincblende",
+        "dielectric_constant":13.1,
+        "lattice_constant":5.65,
         "E_g":1.42,
         "N_ic":4.7e+17,
         "N_iv":7.0e+18,
         "n_i":1.8e+6,
-        "\\mu_n":8500,
-        "\\mu_p":400
+        "mu_n":8500,
+        "mu_p":400
     },
     "Ge":
     {
-        "#cm-3":4.42e+22,
+        "atoms_per_cm_3":4.42e+22,
         "weight":72.60,
-        "Lattice Constant":5.65,
+        "crystal_structure":"Diamond",
+        "dielectric_constant":16.0,
+        "lattice_constant":5.65,
         "E_g":0.66,
         "N_ic":1.04e+19,
         "N_iv":6.0e+18,
         "n_i":2.4e+13,
-        "\\mu_n":3900,
-        "\\mu_p":1900
+        "mu_n":3900,
+        "mu_p":1900
     }
 }

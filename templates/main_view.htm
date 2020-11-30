@@ -42,7 +42,6 @@
             text-align: center;
             width: 143px;
             display: inline-block;
-            border: 1px solid red;
         }
         div.selector_div span{
             display: inline-block;
@@ -51,6 +50,40 @@
             padding: 0;
             /* float:left; */
             width: 100%;
+        }
+        .horizontal_button_list{
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .red_border{
+            border: 1px solid red;
+        }
+        .min_size{
+            display: inline-block;
+            height: max-content;
+            width: max-content;
+        }
+        .horizontal_button_list li{
+            float: left;
+            display: block;
+            text-align: center;
+            padding: 3px;
+            text-decoration: none;
+        }
+        .horizontal_button_list li span:hover{
+            background-color: #bbb;
+        }
+        .horizontal_button_list li span:active{
+            background-color:#999;
+        }
+        .horizontal_button_list_actived{
+            background-color:#999;
+        }
+        .horizontal_button_list_disabled{
+            color: #888;
+            background-color:#bbb;
         }
         .selector_horizontal select{
             position:absolute;
@@ -75,19 +108,20 @@
 <body>
     <ul id="navi_bar" class="noselect">
         <li id="d0">Boltzmann approximation</li>
-        <li id="d1">Hall effect</li>
-        <li id="d2">Photo-electric effect</li>
+        <li id="d1">Fermi-Dirac equation</li>
+        <li id="d2">Hall effect</li>
+        <li id="d3">Photo-electric effect</li>
+        <li id="d4">Crystal structure</li>
         <li></li>
     </ul>
     <!-- #region test -->
-    <div class="d1">
+    <!-- <div class="d4">
         <input type="text" class="n" id="n1" value=1>$\times$
         <input type="text" class="n" id="n2" value=1>$=$
         <span id="out">$1$</span>
-    </div>
+    </div> -->
     <!-- #endregion -->
 
-    <!-- #region Boltzmann approximation 01-->
     <div class="d0">
         <p class="cut_top_margin"><b>Boltzmann approximation:</b></p>
         <p>T: <input type="text" name="temp" id="temp" value=300>
@@ -131,9 +165,7 @@
             <span class="n_i"></span>
         </p>
         <p id="n_i_short">$\mathrm{n_i=}$<span class="n_i"></span></p>
-    <!-- #endregion -->
 
-    <!-- #region Boltzmann approximation 02-->
         <p>solve:
             <select name="p2_selector" id="p2_selector">
                 <option value="solve_n_o">$n_o$</option>
@@ -141,8 +173,6 @@
                 <option value="solve_p_o">$p_o$</option>
                 <option value="solve_E_F_E_v">$E_F-E_v$</option>
             </select>
-
-<!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////// -->
             <span class="solve_n_o">$\mathrm{E_c-E_F=}$<input type="text" name="E_c_E_F_input" id="E_c_E_F_input" value=0.552>$\mathrm{eV}$</span>
 
             <span class="solve_E_c_E_F">$\mathrm{n_o=}$<input type="text" name="n_o_input" id="n_o_input" value=1.5e+10>$\mathrm{cm^{-3}}$</span>
@@ -151,7 +181,7 @@
 
             <span class="solve_E_F_E_v">$\mathrm{p_o=}$<input type="text" name="p_o_input" id="p_o_input" value=1.5e+10>$\mathrm{cm^{-3}}$</span>
 
-<!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+
             <p class="solve_n_o">
                 $\mathrm{n_o=\alpha^{\frac{3}{2}}N_{c_{300k}}e^{-\frac{E_c-E_F}{kT}}=((}$<span class="alpha_frac"></span>
                 $)^{\frac{3}{2}}\times($
@@ -190,7 +220,6 @@
                 <span class="E_F_E_v_out"></span>
             </p>
 
-<!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////// -->
             <p class="solve_n_o solve_E_c_E_F">
                 $\mathrm{E_F-E_v=E_g-(E_c-E_F)=}$
                 <span class="E_g"></span>
@@ -224,8 +253,8 @@
             </p>
         </p>
         <p id="n_o"></p>
-
-<!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+    </div>
+    <div class="d1">
         <p>Energy level: <select name="el_selector" id="el_selector">
             <option value="E_c_E">$E_c-E$</option>
             <option value="E_E_v">$E-E_v$</option>
@@ -245,15 +274,94 @@
         <p>
             $\mathrm{1-f_{FD}(E)=}$<span class="one_minus_f_FD"></span>
         </p>
+        <p><b>p-n junction</b></p>
+        <span class="got_Na">
+            <p>$\mathrm{N_a}=$<input type="text" id="Na_input" value=1.5e+10>$\mathrm{cm^{-3}=}$<span class="Na_m3"></span></p>
+            <p>$\mathrm{E_i-E_{Fp}=kTln\frac{N_a}{n_i}=}$<span class="kT"></span>$\mathrm{\times ln(}$<span class="Na_ni_frac"></span>$\mathrm{)=}$<span class="Ei_Efp"></span></p>
+        </span>
+        <span class="got_Nd">
+            <p>$\mathrm{N_d}=$<input type="text" id="Nd_input" value=1.5e+10>$\mathrm{cm^{-3}=}$<span class="Nd_m3"></span></p>
+            <p>$\mathrm{E_{Fn}-E_i=kTln\frac{N_d}{n_i}=}$<span class="kT"></span>$\mathrm{\times ln(}$<span class="Nd_ni_frac"></span>$\mathrm{)=}$<span class="Efn_Efi"></span></p>
+        </span>
+        <p>$\mathrm{V_o=V_{di}=\frac{kT}{e}ln(\frac{N_aN_d}{n_i^2})=(}$<span class="kT"></span>$\mathrm{)/1e\times ln(}$<span class="NdNa_ni2_frac"></span>$\mathrm{)=}$<span class="V_o"></span></p>
+        <p>$\mathrm{E_i=kTln(\frac{N_aN_d}{n_i^2})=}$<span class="kT"></span>$\mathrm{\times ln(}$<span class="NdNa_ni2_frac"></span>$\mathrm{)=}$<span class="Ei"></span></p>
+        <p></p>
+        <p>$\mathrm{\epsilon_s=\epsilon_o\times\epsilon^\prime=}$<span class="epsilon_o"></span>$\times$<span class="dielectric_constant"></span>$=$<span class="epsilon_s"></span></p>
+        <p>$\mathrm{W=[\frac{2\epsilon_sv_o}{e}\frac{N_a+N_d}{N_aN_d}]^{\frac{1}{2}}=[(}$<span class="twoepsilonvo_over_e_frac"></span>$)\times($<span class="NaplusNd_over_NaNd_frac"></span>$)]^{\frac{1}{2}}=$<span class="W"></span></p>
+        <p>$\mathrm{x_n=\frac{N_a}{N_a+N_b}\times{W}=}$ <span class="Na_over_NaplusNd"></span>$\times$<span class="W"></span>$=$<span class="x_n"></span></p>
+        <p>$\mathrm{x_p=W-x_n=}$<span class="W"></span>$-$<span class="x_n"></span>$=$<span class="x_p"></span></p>
+        <p>$\mathrm{\xi=-\frac{eN_dx_n}{\epsilon_s}=}$<span class="eNdxn_over_epsilons_frac"></span>$=$<span class="electric_field"></span></p>
+        <p>Cross-sectional area: $\mathrm{A=}$<input type="text" class="cross_sectional_area_input" value=1e-6><span class="cross_sectional_area_unit"></span></p>
+        <p>$\mathrm{Q_p=Q_n=-eN_aAx_p=-}$<span class="electric_energy"></span>$\times$ <span class="Na_m3"></span>$\times$<span class="cross_sectional_area"></span>$\times$<span class="x_p"></span>$=$<span class="charge"></span></p>
+
         <!-- <p><b>Fermi-Dirac function: </b>$f_{FD}(E)=\frac{1}{e^{\frac{E-E_F}{kT}}}$</p> -->
-    <!-- #endregion -->
     </div>
-
-    <div class="d1">
-        <span class="frequency"></span>
-    </div>
-
     <div class="d2">
+        <d>choose given variables: </d>
+        <ul id="known_units_list" class="horizontal_button_list">
+            <div class="red_border min_size">
+                <li><span class="checkbox_W">$\mathrm{W}$</span></li>
+                <li><span class="checkbox_L">$\mathrm{L}$</span></li>
+                <li><span class="checkbox_d">$\mathrm{d}$</span></li>
+            </div>
+            <div class="red_border min_size">
+                <li><span class="checkbox_V_H">$\mathrm{V_H}$</span></li>
+            </div>
+            <div class="red_border min_size">
+                <li><span class="checkbox_n">$\mathrm{n}$</span></li>
+            </div>
+            <div class="red_border min_size">
+                <li><span class="checkbox_B_z">$\mathrm{B_z}$</span></li>
+            </div>
+            <div class="red_border min_size">
+                <li><span class="checkbox_E_H">$\mathrm{E_H}$</span></li>
+            </div>
+            <div class="red_border min_size">
+                <li><span class="checkbox_v_x">$\mathrm{v_x}$</span></li>
+                <li><span class="checkbox_J_x">$\mathrm{J_x}$</span></li>
+                <li><span class="checkbox_I_x">$\mathrm{I_x}$</span></li>
+            </div>
+            <div class="red_border min_size">
+                <li><span class="checkbox_Volt_x">$\mathrm{V_x}$</span></li>
+            </div>
+            <div class="red_border min_size">
+                <li><span class="checkbox_mu">$\mathrm{\mu}$</span></li>
+            </div>
+        </ul>
+        <p id="inputpara_W">$\mathrm{W=}$<input type="text" id="input_W" value=1e-4><span class="unit_W"></span></p>
+        <p id="inputpara_L">$\mathrm{L=}$<input type="text" id="input_L" value=1e-3><span class="unit_L"></span></p>
+        <p id="inputpara_d">$\mathrm{d=}$<input type="text" id="input_d" value=1e-5><span class="unit_d"></span></p>
+        <p id="inputpara_V_H">$\mathrm{V_H=}$<input type="text" id="input_V_H" value=-6.25e-3><span class="unit_V_H"></span></p>
+        <p id="inputpara_n">$\mathrm{n=}$<input type="text" id="input_n" value=5e+15><span class="unit_n"></span></p>
+        <p id="inputpara_B_z">$\mathrm{B_z=}$<input type="text" id="input_B_z" value=5e-2><span class="unit_B_z"></span></p>
+        <p id="inputpara_E_H">$\mathrm{E_H=}$<input type="text" id="input_E_H" value=62.5><span class="unit_E_H"></span></p>
+        <p id="inputpara_v_x">$\mathrm{v_x=}$<input type="text" id="input_v_x" value=1250><span class="unit_v_x"></span></p>
+        <p id="inputpara_J_x">$\mathrm{J_x=}$<input type="text" id="input_J_x" value=1e+6><span class="unit_J_x"></span></p>
+        <p id="inputpara_I_x">$\mathrm{I_x=}$<input type="text" id="input_I_x" value=1e-3><span class="unit_I_x"></span></p>
+        <p id="inputpara_Volt_x">$\mathrm{V_x=}$<input type="text" id="input_Volt_x" value=12.5><span class="unit_Volt_x"></span></p>
+        <p id="inputpara_mu">$\mathrm{\mu=}$<input type="text" id="pninput_mu" value=.1><span class="unit_mu"></span></p>
+
+        <p class="pnsolve_n need_J_x need_v_x">$\mathrm{n=\frac{J_x}{V_xe}=}$<span class="jx_over_vxe_frac"></span>$=$<span class="n"></span></p>
+
+        <p class="pnsolve_v_x need_n need_J_x">$\mathrm{v_x=\frac{J_x}{en}=}$<span class="jx_over_en_frac"></span>$=$<span class="v_x"></span></p>
+        <p class="pnsolve_v_x need_I_x need_n need_W need_d">$\mathrm{v_x=\frac{I_x}{enWd}=}$<span class="ix_over_enWd_frac"></span>$=$<span class="v_x"></span></p>
+
+        <p class="pnsolve_E_H need_v_x need_B_z">$\mathrm{E_H=v_xB_z=(}$<span class="v_x"></span>$)\times($<span class="B_z"></span>$)=$<span class="E_H"></span></p>
+
+        <p class="pnsolve_B_z need_v_x need_E_H">$\mathrm{B_z=\frac{E_H}{v_x}=}$<span class="EH_over_vx_frac"></span>$=$<span class="B_z"></span></p>
+
+        <p class="pnsolve_V_H need_E_H need_W">$\mathrm{V_H=-E_HW=-(}$<span class="E_H"></span>$)\times($<span class="W"></span>$)=$<span class="V_H"></span></p>
+        <p class="pnsolve_V_H need_v_x need_W need_B_z">$\mathrm{V_H=-v_xWB_z=-(}$<span class="v_x"></span>$)\times($<span class="W"></span>$)\times($<span class="B_z"></span>$)=$<span class="V_H"></span></p>
+        <p class="pnsolve_V_H need_I_x need_B_z need_n need_d">$\mathrm{V_H=-\frac{I_xB_z}{ned}=}$<span class="IxBz_over_ned_frac"></span>$=$<span class="V_H"></span></p>
+
+        <p class="pnsolve_J_x need_I_x need_W need_d">$\mathrm{J_x=\frac{I_x}{Wd}=}$<span class="ix_over_Wd_frac"></span>$=$<span class="J_x"></span></p>
+        <p class="pnsolve_I_x need_W need_d need_n need_mu need_Volt_x">$\mathrm{I_x=\frac{Wden\mu V_x}{L}=}$<span class="WdenmuVolt_x_over_L_frac"></span>$=$<span class="I_x"></span></p>
+
+        <p class="pnsolve_n need_I_x need_B_z need_d need_V_H">$\mathrm{n=\frac{I_xB_z}{edV_H}=}$<span class="ixbz_over_edVH_frac"></span>$=$<span class="n"></span></p>
+
+        <p class="pnsolve_mu need_I_x need_L need_n need_Volt_x">$\mathrm{\mu_n=\frac{I_xL}{enV_xWd}}$<span class="IxL_over_enVxWd_frac"></span>$=$<span class="mu"></span></p>
+    </div>
+    <div class="d3">
         <p>Given: <select name="photoelectric_selector" id="photoelectric_selector">
             <option value="wave_length">$\lambda$</option>
             <option value="frequency">$f$</option>
@@ -261,7 +369,7 @@
             <option value="wave_number">$k$</option>
         </select></p>
         <div>
-            <div class="selector_div">
+            <div class="selector_div red_border">
                 <span>wave length unit</span>
                 <select name="wl_unit_selector" id="wl_unit_selector">
                     <option value="m">$m$</option>
@@ -270,14 +378,14 @@
                     <option value="Å">Å</option>
                 </select>
             </div>
-            <div class="selector_div">
+            <div class="selector_div red_border">
                 <span>photon elergy unit</span>
                 <select name="pe_unit_selector" id="pe_unit_selector">
                     <option value="J">$J$</option>
                     <option value="eV">$eV$</option>
                 </select>
             </div>
-            <div class="selector_div">
+            <div class="selector_div red_border">
                 <span>wave number unit</span>
                 <select name="wn_unit_selector" id="wn_unit_selector">
                     <option value="m^{-1}">$m^{-1}$</option>
@@ -312,5 +420,54 @@
             <p>energy of photon: $\mathrm{E=hf=}$<span class="p_energy"></span></p>
         </span>
     </div>
+    <div class="d4">
+        <p><b>Choose material : </b><select id="semi_crystal_selector">
+            <option value="Si">$Si$</option>
+            <option value="GaAs">$GaAs$</option>
+            <option value="Ge">$Ge$</option>
+            <option value="other">other</option>
+        </select></p>
+    </div>
+    <div class="choose_other">
+        <p>
+            <select id="semi_lattice_unit_selector">
+                <option value="m">$m$</option>
+                <option value="angstrom">Å</option>
+            </select>
+            <span class="semi_lattice_in_angstrom">
+                <b>Lattice constant</b>$a=$
+                <input type="text" id="lattice_constant_input" value=5.43>Å$=$
+                <span class="lattice_constant_in_m"></span>
+            </span>
+            <span class="semi_lattice_in_m">
+                <b>Lattice constant</b>$a=$<input type="text" id="lattice_constant_in_m_input" value=5.43e-10>$m=$<span class="lattice_constant"></span>
+            </span>
+        </p>
+        <p>
+            <select id="semi_weight_unit_selector">
+                <option value="u">u</option>
+                <option value="kg">kg</option>
+            </select>
+            <span class="semi_weight_in_u">
+                <b>Atomic weight</b>$m=$<input type="text" class="atomic_weight_input" value=28.09>$u=$<span class="atomic_weight_in_kg"></span>
+            </span>
+            <span class="semi_weight_in_kg">
+                <b>Atomic weight</b>$m=$<input type="text" class="atomic_weight_in_kg_input" value=28.09>$kg=$<span class="atomic_weight"></span>
+            </span>
+        </p>
+    </div>
+
+    <div class="notchoose_other">
+        <p>
+            <b>Lattice constant</b>$a=$<span class="lattice_constant"></span>$=$<span class="lattice_constant_in_m"></span>
+        </p>
+        <p>
+            <b>Atomic weight</b>$m=$<span class="atomic_weight"></span>$=$<span class="atomic_weight_in_kg"></span>
+        </p>
+    </div>
+
+    <p>Volumn density: $VD=\frac{N}{V}=$<span class="N_over_V"></span>$=$ <span class="volumn_density"></span></p>
+    <p>Mass density: $MD=\frac{M}{V}=$<span class="M_over_V"></span>$=$ <span class="mass_density"></span></p>
+    <p></p>
 </body>
 </html>
